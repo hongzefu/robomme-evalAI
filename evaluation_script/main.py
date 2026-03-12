@@ -205,6 +205,12 @@ def run_episode(agent_url, phase_codename, episode_index, episode_seed):
                 ),
             )
             observation, reward, terminated, truncated, _ = env.step(action)
+
+            print("observation", observation)
+            print("reward", reward)
+            print("terminated", terminated)
+            print("truncated", truncated)
+
             total_reward += float(reward)
             steps_taken = step_index + 1
             if terminated or truncated:
