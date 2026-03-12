@@ -1,2 +1,4 @@
 PyGithub===1.53
+PyJWT[crypto]==2.12.0
 requests==2.32.4
+typing_extensions>=4.12.2,<5

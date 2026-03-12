@@ -19,7 +19,7 @@ jobs:
       requires_self_hosted: ${{ steps.validate.outputs.requires_self_hosted }}
     steps:
       - name: Checkout code
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
 
       - name: Validate host_config.json
         id: validate
@@ -129,13 +129,13 @@ jobs:
     
     steps:
       - name: Checkout challenge branch
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
         with:
           ref: challenge
 
       - name: Set up Python (GitHub-hosted only)
         if: needs.validate-host-config.outputs.requires_self_hosted != 'true'
-        uses: actions/setup-python@v4
+        uses: actions/setup-python@v5
         with:
           python-version: 3.9.21
 
