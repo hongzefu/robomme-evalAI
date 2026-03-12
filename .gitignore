@@ -2,6 +2,7 @@ challenge_config.zip
 evaluation_script.zip
 
 # virtualenv
+.venv/
 env/
 venv/
 

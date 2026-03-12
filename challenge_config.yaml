@@ -1,41 +1,47 @@
-# If you are not sure what all these fields mean, please refer our documentation here:
+# If you are not sure what these fields mean, refer to:
 # https://evalai.readthedocs.io/en/latest/configuration.html
-title: Random Number Generator Challenge
-short_description: Random number generation challenge for each submission
+title: MiniGrid HTTP Agent Challenge
+short_description: Evaluate a remotely hosted MiniGrid agent via POST /act.
 description: templates/description.html
 evaluation_details: templates/evaluation_details.html
 terms_and_conditions: templates/terms_and_conditions.html
 image: logo.jpg
 submission_guidelines: templates/submission_guidelines.html
-category: [Paper, Dataset, Environment, Workshop]
-leaderboard_description: Lorem ipsum dolor sit amet, consectetur adipiscing elit. Cras egestas a libero nec sagittis.
+category: [Environment, Workshop]
+leaderboard_description: Public leaderboard metrics come from the MiniGrid public split. Private split scores are hidden from participants.
 evaluation_script: evaluation_script.zip
-remote_evaluation: False
-start_date: 2019-01-01 00:00:00
-end_date: 2099-05-31 23:59:59
+remote_evaluation: True
+start_date: 2026-03-12 00:00:00
+end_date: 2099-12-31 23:59:59
 published: True
-tags: 
-  - random-number-generation
-  - machine-learning
-  - data-science
-  - computer-vision
+tags:
+  - minigrid
+  - reinforcement-learning
+  - embodied-ai
+  - remote-evaluation
+
 leaderboard:
   - id: 1
     schema:
-      {
-        "labels": ["Metric1", "Metric2", "Metric3", "Total"],
-        "default_order_by": "Total",
-        "metadata": {
-          "Metric1": {
-            "sort_ascending": True,
-            "description": "Lorem ipsum dolor sit amet, consectetur adipiscing elit.",
-          },
-          "Metric2": {
-            "sort_ascending": True,
-            "description": "Lorem ipsum dolor sit amet, consectetur adipiscing elit.",
-          }
-        }
-      }
+      labels:
+        - AverageReward
+        - SuccessRate
+        - AverageSteps
+        - Episodes
+      default_order_by: AverageReward
+      metadata:
+        AverageReward:
+          sort_ascending: false
+          description: Mean episode reward on the split.
+        SuccessRate:
+          sort_ascending: false
+          description: Fraction of episodes with positive total reward.
+        AverageSteps:
+          sort_ascending: true
+          description: Mean number of agent actions per episode.
+        Episodes:
+          sort_ascending: false
+          description: Number of evaluated episodes in the split.
 
 challenge_phases:
   - id: 1
@@ -49,13 +55,13 @@ challenge_phases:
     allowed_email_ids: []
     disable_logs: False
     is_submission_public: True
-    start_date: 2019-01-19 00:00:00
-    end_date: 2099-04-25 23:59:59
+    start_date: 2026-03-12 00:00:00
+    end_date: 2099-12-31 23:59:59
     test_annotation_file: annotations/test_annotations_devsplit.json
     codename: dev
-    max_submissions_per_day: 5
-    max_submissions_per_month: 50
-    max_submissions: 50
+    max_submissions_per_day: 20
+    max_submissions_per_month: 200
+    max_submissions: 1000
     default_submission_meta_attributes:
       - name: method_name
         is_visible: True
@@ -65,44 +71,28 @@ challenge_phases:
         is_visible: True
       - name: publication_url
         is_visible: True
-    submission_meta_attributes:
-      - name: TextAttribute
-        description: Sample
-        type: text
-        required: False
-      - name: SingleOptionAttribute
-        description: Sample
-        type: radio
-        options: ["A", "B", "C"]
-      - name: MultipleChoiceAttribute
-        description: Sample
-        type: checkbox
-        options: ["alpha", "beta", "gamma"]
-      - name: TrueFalseField
-        description: Sample
-        type: boolean
-        required: True
+    submission_meta_attributes: []
     is_restricted_to_select_one_submission: False
     is_partial_submission_evaluation_enabled: False
-    allowed_submission_file_types: ".json, .zip, .txt, .tsv, .gz, .csv, .h5, .npy, .npz"
+    allowed_submission_file_types: ".json"
   - id: 2
     name: Test Phase
     description: templates/challenge_phase_2_description.html
     leaderboard_public: True
     is_public: True
-    challenge: 2
+    challenge: 1
     is_active: True
     max_concurrent_submissions_allowed: 3
     allowed_email_ids: []
     disable_logs: False
     is_submission_public: True
-    start_date: 2019-01-01 00:00:00
-    end_date: 2099-05-24 23:59:59
+    start_date: 2026-03-12 00:00:00
+    end_date: 2099-12-31 23:59:59
     test_annotation_file: annotations/test_annotations_testsplit.json
     codename: test
-    max_submissions_per_day: 5
-    max_submissions_per_month: 50
-    max_submissions: 50
+    max_submissions_per_day: 20
+    max_submissions_per_month: 200
+    max_submissions: 1000
     default_submission_meta_attributes:
       - name: method_name
         is_visible: True
@@ -112,37 +102,24 @@ challenge_phases:
         is_visible: True
       - name: publication_url
         is_visible: True
-    submission_meta_attributes:
-      - name: TextAttribute
-        description: Sample
-        type: text
-      - name: SingleOptionAttribute
-        description: Sample
-        type: radio
-        options: ["A", "B", "C"]
-      - name: MultipleChoiceAttribute
-        description: Sample
-        type: checkbox
-        options: ["alpha", "beta", "gamma"]
-      - name: TrueFalseField
-        description: Sample
-        type: boolean
+    submission_meta_attributes: []
     is_restricted_to_select_one_submission: False
     is_partial_submission_evaluation_enabled: False
+    allowed_submission_file_types: ".json"
 
 dataset_splits:
   - id: 1
-    name: Train Split
-    codename: train_split
+    name: Public Split
+    codename: public_split
   - id: 2
-    name: Test Split
-    codename: test_split
+    name: Private Split
+    codename: private_split
 
 challenge_phase_splits:
   - challenge_phase_id: 1
     leaderboard_id: 1
     dataset_split_id: 1
-    visibility: 1
+    visibility: 2
     leaderboard_decimal_precision: 2
     is_leaderboard_order_descending: True
     show_execution_time: True
@@ -153,8 +130,8 @@ challenge_phase_splits:
     visibility: 3
     leaderboard_decimal_precision: 2
     is_leaderboard_order_descending: True
-    showeceution_time: False
-    show_leaderboard_by_latest_submission: False
+    show_execution_time: True
+    show_leaderboard_by_latest_submission: True
   - challenge_phase_id: 2
     leaderboard_id: 1
     dataset_split_id: 2
@@ -162,4 +139,4 @@ challenge_phase_splits:
     leaderboard_decimal_precision: 2
     is_leaderboard_order_descending: True
     show_execution_time: True
-    show_leaderboard_by_latest_submission: True
+    show_leaderboard_by_latest_submission: False

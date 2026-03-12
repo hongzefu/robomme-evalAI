@@ -1,17 +1,31 @@
-## How to setup remote challenge evaluation using EvalAI :rocket:
-If you are looking for setting up a remote challenge evaluation on EvalAI, then you are at the right place. Follow the instructions given below to get started.
+# Remote worker
 
-1. Create a challenge on EvalAI using [GitHub](https://github.com/Cloud-CV/EvalAI-Starters#create-challenge-using-github) based challenge creation.
+This worker polls the EvalAI remote evaluation queue, downloads the submitted
+manifest, and calls `evaluation_script.main.evaluate()` to score it.
 
-2. Once the challenge is successfully created, please email EvalAI admin on team@cloudcv.org for sending the `challenge_pk` and `queue_name`.
+## Environment variables
 
-3. After receiving the details from the admin, please add these in the `evaluation_script_starter.py`.
+- `AUTH_TOKEN`: EvalAI auth token for the worker account
+- `API_SERVER`: EvalAI API base URL, for example `https://eval.ai`
+- `QUEUE_NAME`: queue name provided by EvalAI
+- `CHALLENGE_PK`: challenge primary key provided by EvalAI
+- `SAVE_DIR`: directory for temporary manifest downloads, default `./`
+- `POLL_INTERVAL_SEC`: queue polling interval, default `5`
+- `AGENT_TIMEOUT_SEC`: timeout for each `POST /act`, default `10`
+- `ALLOW_LOCAL_AGENT_URLS`: set to `1` only for local testing
 
-4. Create a new virtual python3 environment for installating the worker requirements.
+## Install
 
-5. Install the requirements using `pip install -r requirements.txt`.
+```bash
+python3 -m venv .venv
+.venv/bin/python -m pip install --upgrade pip
+.venv/bin/python -m pip install -r remote_challenge_evaluation/requirements.txt
+```
 
-6. For python3, run the worker using `python -m evaluation_script_starter`
-## Facing problems in setting up evaluation?
+## Run
 
-Please feel free to open issues on our [GitHub Repository](https://github.com/Cloud-CV/EvalAI-Starter/issues) or contact us at team@cloudcv.org if you have issues.
+```bash
+.venv/bin/python -m remote_challenge_evaluation.main
+```
+
+The worker is single-process and consumes one submission at a time.

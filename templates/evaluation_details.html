@@ -1,1 +1,36 @@
-<p>"Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum."</p>
+<p>The evaluator uses the following fixed setup:</p>
+<ul>
+  <li>Environment: <code>MiniGrid-Empty-5x5-v0</code></li>
+  <li>Observation fields: <code>image</code>, <code>direction</code>, <code>mission</code></li>
+  <li>Action space: discrete with <code>n=7</code></li>
+  <li>Per-episode step budget: <code>100</code></li>
+</ul>
+
+<p>Each evaluation step sends the current observation to:</p>
+<pre><code>POST {agent_url}/act</code></pre>
+
+<p>Request body:</p>
+<pre><code>{
+  "phase_codename": "dev|test",
+  "env_id": "MiniGrid-Empty-5x5-v0",
+  "episode_index": 0,
+  "episode_seed": 0,
+  "step_index": 0,
+  "max_steps": 100,
+  "action_space": {"type": "discrete", "n": 7},
+  "observation": {
+    "image": [[[...]]],
+    "direction": 0,
+    "mission": "get to the green goal square"
+  }
+}</code></pre>
+
+<p>Expected response:</p>
+<pre><code>{"action": 0}</code></pre>
+
+<p>
+  Any timeout, non-2xx response, invalid JSON, missing <code>action</code>, or
+  out-of-range action causes the submission to fail. Metrics are:
+  <code>AverageReward</code>, <code>SuccessRate</code>,
+  <code>AverageSteps</code>, and <code>Episodes</code>.
+</p>

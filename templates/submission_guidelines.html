@@ -1,1 +1,21 @@
-<p>Submit any blank file here to see a random number generated for your submission. If you get lucky, you might reach the top of the leaderboard.</p>
+<p>Upload a single JSON file with exactly one field:</p>
+<pre><code>{
+  "agent_url": "https://your-agent.example.com"
+}</code></pre>
+
+<p>
+  <code>agent_url</code> must be an <code>http</code> or <code>https</code> base
+  URL. EvalAI will call <code>{agent_url}/act</code> during evaluation.
+</p>
+
+<p>The manifest is rejected if:</p>
+<ul>
+  <li>the JSON is invalid or contains extra fields</li>
+  <li>the URL is missing a hostname or includes a path, query, or fragment</li>
+  <li>the URL resolves to loopback or private network addresses</li>
+</ul>
+
+<p>
+  Your agent service must stay reachable for the full evaluation window and must
+  answer every <code>POST /act</code> request within the configured timeout.
+</p>
