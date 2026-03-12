@@ -1,5 +1,6 @@
 import argparse
 import json
+import os
 import tempfile
 from pathlib import Path
 
@@ -7,8 +8,14 @@ from evaluation_script.main import evaluate
 
 
 def main():
+    # Allow localhost/127.0.0.1 for local smoke testing
+    os.environ.setdefault("ALLOW_LOCAL_AGENT_URLS", "1")
     parser = argparse.ArgumentParser(description="Run a local MiniGrid smoke test.")
-    parser.add_argument("--agent-url", required=True, help="Base URL of the running agent.")
+    parser.add_argument(
+        "--agent-url",
+        default="http://127.0.0.1:8001",
+        help="Base URL of the running agent.",
+    )
     parser.add_argument(
         "--phase",
         choices=("dev", "test"),
