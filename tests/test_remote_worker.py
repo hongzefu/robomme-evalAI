@@ -60,7 +60,13 @@ def test_process_message_success_path(monkeypatch, tmp_path):
         worker_main,
         "evaluate",
         lambda test_annotation_file, user_submission_file, phase_codename, **kwargs: {
-            "result": [{"public_split": {"AverageReward": 1.0}}],
+            "result": [
+                {
+                    "split": "public_split",
+                    "show_to_participant": True,
+                    "accuracies": {"AverageReward": 1.0},
+                }
+            ],
             "submission_result": {"AverageReward": 1.0},
         },
     )
@@ -77,7 +83,13 @@ def test_process_message_success_path(monkeypatch, tmp_path):
             "stdout": "",
             "stderr": "",
             "submission_status": "FINISHED",
-            "result": [{"public_split": {"AverageReward": 1.0}}],
+            "result": [
+                {
+                    "split": "public_split",
+                    "show_to_participant": True,
+                    "accuracies": {"AverageReward": 1.0},
+                }
+            ],
             "submission_result": {"AverageReward": 1.0},
             "metadata": "",
         }
@@ -162,7 +174,13 @@ def test_process_message_logs_and_cleans_up_when_finish_update_fails(
         worker_main,
         "evaluate",
         lambda *args, **kwargs: {
-            "result": [{"public_split": {"AverageReward": 2.0}}],
+            "result": [
+                {
+                    "split": "public_split",
+                    "show_to_participant": True,
+                    "accuracies": {"AverageReward": 2.0},
+                }
+            ],
             "submission_result": {"AverageReward": 2.0},
         },
     )
@@ -226,7 +244,13 @@ def test_evalai_interface_serializes_result_and_metadata():
     payload = evalai._normalize_request_data(
         {
             "submission": 3,
-            "result": [{"public_split": {"AverageReward": 1.0}}],
+            "result": [
+                {
+                    "split": "public_split",
+                    "show_to_participant": True,
+                    "accuracies": {"AverageReward": 1.0},
+                }
+            ],
             "submission_result": {"AverageReward": 1.0},
             "metadata": {"episode_count": 3},
             "stdout": "",
@@ -235,7 +259,15 @@ def test_evalai_interface_serializes_result_and_metadata():
 
     assert payload == {
         "submission": 3,
-        "result": json.dumps([{"public_split": {"AverageReward": 1.0}}]),
+        "result": json.dumps(
+            [
+                {
+                    "split": "public_split",
+                    "show_to_participant": True,
+                    "accuracies": {"AverageReward": 1.0},
+                }
+            ]
+        ),
         "submission_result": json.dumps({"AverageReward": 1.0}),
         "metadata": json.dumps({"episode_count": 3}),
         "stdout": "",

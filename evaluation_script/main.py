@@ -64,9 +64,15 @@ def evaluate(test_annotation_file, user_submission_file, phase_codename, **kwarg
     results = []
     for split_name, seeds in PHASE_SPLITS[phase_codename]:
         metrics = evaluate_split(agent_url, phase_codename, split_name, seeds)
-        results.append({split_name: metrics})
+        results.append(
+            {
+                "split": split_name,
+                "show_to_participant": split_name == "public_split",
+                "accuracies": metrics,
+            }
+        )
 
-    output = {"result": results, "submission_result": results[0]["public_split"]}
+    output = {"result": results, "submission_result": results[0]["accuracies"]}
     return output
 
 

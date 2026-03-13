@@ -182,15 +182,17 @@ def test_evaluate_sends_expected_payload_and_closes_envs(monkeypatch, tmp_path):
 
     assert result["result"] == [
         {
-            "public_split": {
+            "split": "public_split",
+            "show_to_participant": True,
+            "accuracies": {
                 "AverageReward": 1.0,
                 "SuccessRate": 1.0,
                 "AverageSteps": 1.0,
                 "Episodes": 3,
-            }
+            },
         }
     ]
-    assert result["submission_result"] == result["result"][0]["public_split"]
+    assert result["submission_result"] == result["result"][0]["accuracies"]
     assert len(envs) == 3
     assert all(env.closed for env in envs)
 
@@ -255,23 +257,27 @@ def test_test_phase_returns_public_and_private_splits(monkeypatch, tmp_path):
 
     assert result["result"] == [
         {
-            "public_split": {
+            "split": "public_split",
+            "show_to_participant": True,
+            "accuracies": {
                 "AverageReward": 1.0,
                 "SuccessRate": 1.0,
                 "AverageSteps": 1.0,
                 "Episodes": 5,
-            }
+            },
         },
         {
-            "private_split": {
+            "split": "private_split",
+            "show_to_participant": False,
+            "accuracies": {
                 "AverageReward": 1.0,
                 "SuccessRate": 1.0,
                 "AverageSteps": 1.0,
                 "Episodes": 20,
-            }
+            },
         },
     ]
-    assert result["submission_result"] == result["result"][0]["public_split"]
+    assert result["submission_result"] == result["result"][0]["accuracies"]
 
 
 def test_envs_are_closed_when_agent_response_fails(monkeypatch, tmp_path):
