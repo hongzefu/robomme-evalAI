@@ -213,6 +213,38 @@ def test_evaluate_sends_expected_payload_and_closes_envs(monkeypatch, tmp_path):
     }
 
 
+def test_request_action_retries_connection_errors(monkeypatch):
+    attempts = []
+
+    def fake_post(url, json, timeout):
+        attempts.append({"url": url, "json": json, "timeout": timeout})
+        if len(attempts) < 3:
+            raise requests.exceptions.SSLError("eof")
+        return DummyResponse({"action": 0})
+
+    monkeypatch.setattr(eval_main.requests, "post", fake_post)
+
+    action = eval_main.request_action("https://agent.example.com", {"step_index": 0})
+
+    assert action == 0
+    assert len(attempts) == 3
+
+
+def test_request_action_fails_after_retry_budget(monkeypatch):
+    attempts = []
+
+    def fake_post(url, json, timeout):
+        attempts.append({"url": url, "json": json, "timeout": timeout})
+        raise requests.exceptions.ConnectionError("connection reset")
+
+    monkeypatch.setattr(eval_main.requests, "post", fake_post)
+
+    with pytest.raises(eval_main.SubmissionError, match="Agent request failed"):
+        eval_main.request_action("https://agent.example.com", {"step_index": 0})
+
+    assert len(attempts) == eval_main.DEFAULT_AGENT_REQUEST_ATTEMPTS
+
+
 def test_test_phase_returns_public_and_private_splits(monkeypatch, tmp_path):
     install_fake_env(monkeypatch)
     install_public_host(monkeypatch)

@@ -14,6 +14,7 @@ ENV_ID = "MiniGrid-Empty-5x5-v0"
 MAX_STEPS = 100
 ACTION_SPACE_SIZE = 7
 DEFAULT_AGENT_TIMEOUT_SEC = 10
+DEFAULT_AGENT_REQUEST_ATTEMPTS = 3
 PHASE_SPLITS = {
     "dev": [("public_split", [0, 1, 2])],
     "test": [
@@ -161,6 +162,10 @@ def agent_timeout_sec():
     return timeout
 
 
+def agent_request_attempts():
+    return DEFAULT_AGENT_REQUEST_ATTEMPTS
+
+
 def evaluate_split(agent_url, phase_codename, split_name, seeds):
     total_reward = 0.0
     total_steps = 0
@@ -268,13 +273,26 @@ def serialize_observation(observation):
 
 def request_action(agent_url, payload):
     endpoint = f"{agent_url}/act"
-    try:
-        response = requests.post(endpoint, json=payload, timeout=agent_timeout_sec())
-        response.raise_for_status()
-    except requests.exceptions.Timeout as exc:
-        raise SubmissionError(f"Agent request timed out at {endpoint}.") from exc
-    except requests.exceptions.RequestException as exc:
-        raise SubmissionError(f"Agent request failed at {endpoint}: {exc}") from exc
+    last_exception = None
+
+    for attempt in range(agent_request_attempts()):
+        try:
+            response = requests.post(endpoint, json=payload, timeout=agent_timeout_sec())
+            response.raise_for_status()
+            break
+        except requests.exceptions.Timeout as exc:
+            raise SubmissionError(f"Agent request timed out at {endpoint}.") from exc
+        except (
+            requests.exceptions.ConnectionError,
+            requests.exceptions.SSLError,
+        ) as exc:
+            last_exception = exc
+            if attempt + 1 == agent_request_attempts():
+                raise SubmissionError(f"Agent request failed at {endpoint}: {exc}") from exc
+        except requests.exceptions.RequestException as exc:
+            raise SubmissionError(f"Agent request failed at {endpoint}: {exc}") from exc
+    else:
+        raise SubmissionError(f"Agent request failed at {endpoint}: {last_exception}")
 
     try:
         response_json = response.json()
