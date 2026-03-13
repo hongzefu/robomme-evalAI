@@ -4,6 +4,7 @@ from pathlib import Path
 import pytest
 
 from remote_challenge_evaluation import main as worker_main
+from remote_challenge_evaluation.eval_ai_interface import EvalAI_Interface
 
 
 class FakeEvalAI:
@@ -75,7 +76,7 @@ def test_process_message_success_path(monkeypatch, tmp_path):
             "stdout": "",
             "stderr": "",
             "submission_status": "FINISHED",
-            "result": json.dumps([{"public_split": {"AverageReward": 1.0}}]),
+            "result": [{"public_split": {"AverageReward": 1.0}}],
             "metadata": "",
         }
     ]
@@ -212,3 +213,23 @@ def test_process_message_deletes_empty_queue_messages(caplog, tmp_path):
 def test_cleanup_file_ignores_missing_path(tmp_path):
     missing_path = Path(tmp_path / "missing.json")
     worker_main.cleanup_file(str(missing_path))
+
+
+def test_evalai_interface_serializes_result_and_metadata():
+    evalai = EvalAI_Interface("token", "https://eval.ai", "queue", 1)
+
+    payload = evalai._normalize_request_data(
+        {
+            "submission": 3,
+            "result": [{"public_split": {"AverageReward": 1.0}}],
+            "metadata": {"episode_count": 3},
+            "stdout": "",
+        }
+    )
+
+    assert payload == {
+        "submission": 3,
+        "result": json.dumps([{"public_split": {"AverageReward": 1.0}}]),
+        "metadata": json.dumps({"episode_count": 3}),
+        "stdout": "",
+    }

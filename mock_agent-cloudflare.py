@@ -12,7 +12,9 @@ import uvicorn
 from mock_agent import app
 
 
-TRY_CLOUDFLARE_URL_RE = re.compile(r"https://[-a-z0-9]+\.trycloudflare\.com")
+TRY_CLOUDFLARE_URL_RE = re.compile(
+    r"https://[a-z0-9]+(?:-[a-z0-9]+)+\.trycloudflare\.com"
+)
 
 
 def parse_args():
@@ -167,6 +169,12 @@ def _wait_for_public_url(process, output_lines, startup_timeout):
             return match.group(0).rstrip("/")
 
     if process.poll() is None:
+        details = "\n".join(recent_lines).strip()
+        if details:
+            raise RuntimeError(
+                "Timed out waiting for cloudflared to publish a public URL.\n"
+                f"Recent cloudflared output:\n{details}"
+            )
         raise RuntimeError("Timed out waiting for cloudflared to publish a public URL.")
 
     details = "\n".join(recent_lines).strip()

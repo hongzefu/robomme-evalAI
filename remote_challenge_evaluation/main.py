@@ -132,7 +132,7 @@ def process_message(evalai, message, save_dir):
             evalai,
             phase_pk,
             submission_pk,
-            json.dumps(results["result"]),
+            results["result"],
         )
     except Exception as exc:
         LOGGER.exception("Failed to process submission %s", submission_pk)

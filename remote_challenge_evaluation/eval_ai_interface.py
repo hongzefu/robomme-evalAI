@@ -1,3 +1,4 @@
+import json
 import logging
 
 import requests
@@ -50,15 +51,36 @@ class EvalAI_Interface:
             [JSON]: JSON response data
         """
         headers = self.get_request_headers()
+        data = self._normalize_request_data(data)
         try:
             response = requests.request(
                 method=method, url=url, headers=headers, data=data
             )
             response.raise_for_status()
+        except requests.exceptions.HTTPError:
+            logger.exception(
+                "EvalAI request failed with status %s and body: %s",
+                response.status_code,
+                response.text,
+            )
+            raise
         except requests.exceptions.RequestException:
             logger.info("The server isn't able establish connection with EvalAI")
             raise
         return response.json()
+
+    def _normalize_request_data(self, data):
+        """Serialize structured form fields that EvalAI expects as JSON strings."""
+        if not isinstance(data, dict):
+            return data
+
+        normalized = data.copy()
+        for key in ("result", "metadata"):
+            value = normalized.get(key)
+            if value == "" or value is None or isinstance(value, str):
+                continue
+            normalized[key] = json.dumps(value)
+        return normalized
 
     def return_url_per_environment(self, url):
         """Function to get the URL for API
