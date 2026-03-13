@@ -51,7 +51,7 @@ challenge_phases:
     is_public: True
     challenge: 1
     is_active: True
-    max_concurrent_submissions_allowed: 3
+    max_concurrent_submissions_allowed: 99999
     allowed_email_ids: []
     disable_logs: False
     is_submission_public: True
@@ -59,9 +59,9 @@ challenge_phases:
     end_date: 2099-12-31 23:59:59
     test_annotation_file: annotations/test_annotations_devsplit.json
     codename: dev
-    max_submissions_per_day: 20
-    max_submissions_per_month: 200
-    max_submissions: 1000
+    max_submissions_per_day: 99999
+    max_submissions_per_month: 99999
+    max_submissions: 99999
     default_submission_meta_attributes:
       - name: method_name
         is_visible: True
