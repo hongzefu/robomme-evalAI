@@ -60,7 +60,8 @@ def test_process_message_success_path(monkeypatch, tmp_path):
         worker_main,
         "evaluate",
         lambda test_annotation_file, user_submission_file, phase_codename, **kwargs: {
-            "result": [{"public_split": {"AverageReward": 1.0}}]
+            "result": [{"public_split": {"AverageReward": 1.0}}],
+            "submission_result": {"AverageReward": 1.0},
         },
     )
 
@@ -77,6 +78,7 @@ def test_process_message_success_path(monkeypatch, tmp_path):
             "stderr": "",
             "submission_status": "FINISHED",
             "result": [{"public_split": {"AverageReward": 1.0}}],
+            "submission_result": {"AverageReward": 1.0},
             "metadata": "",
         }
     ]
@@ -159,7 +161,10 @@ def test_process_message_logs_and_cleans_up_when_finish_update_fails(
     monkeypatch.setattr(
         worker_main,
         "evaluate",
-        lambda *args, **kwargs: {"result": [{"public_split": {"AverageReward": 2.0}}]},
+        lambda *args, **kwargs: {
+            "result": [{"public_split": {"AverageReward": 2.0}}],
+            "submission_result": {"AverageReward": 2.0},
+        },
     )
 
     def fail_update(data):
@@ -222,6 +227,7 @@ def test_evalai_interface_serializes_result_and_metadata():
         {
             "submission": 3,
             "result": [{"public_split": {"AverageReward": 1.0}}],
+            "submission_result": {"AverageReward": 1.0},
             "metadata": {"episode_count": 3},
             "stdout": "",
         }
@@ -230,6 +236,7 @@ def test_evalai_interface_serializes_result_and_metadata():
     assert payload == {
         "submission": 3,
         "result": json.dumps([{"public_split": {"AverageReward": 1.0}}]),
+        "submission_result": json.dumps({"AverageReward": 1.0}),
         "metadata": json.dumps({"episode_count": 3}),
         "stdout": "",
     }

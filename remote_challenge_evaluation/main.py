@@ -67,6 +67,7 @@ def update_finished(
     phase_pk,
     submission_pk,
     result,
+    submission_result,
     submission_error="",
     stdout="",
     metadata="",
@@ -78,6 +79,7 @@ def update_finished(
         "stderr": submission_error,
         "submission_status": "FINISHED",
         "result": result,
+        "submission_result": submission_result,
         "metadata": metadata,
     }
     return evalai.update_submission_data(submission_data)
@@ -133,6 +135,7 @@ def process_message(evalai, message, save_dir):
             phase_pk,
             submission_pk,
             results["result"],
+            results["submission_result"],
         )
     except Exception as exc:
         LOGGER.exception("Failed to process submission %s", submission_pk)

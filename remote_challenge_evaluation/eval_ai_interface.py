@@ -75,7 +75,7 @@ class EvalAI_Interface:
             return data
 
         normalized = data.copy()
-        for key in ("result", "metadata"):
+        for key in ("result", "metadata", "submission_result"):
             value = normalized.get(key)
             if value == "" or value is None or isinstance(value, str):
                 continue
