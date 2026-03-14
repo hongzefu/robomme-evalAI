@@ -30,7 +30,23 @@
 
 <p>
   Any timeout, non-2xx response, invalid JSON, missing <code>action</code>, or
-  out-of-range action causes the submission to fail. Metrics are:
-  <code>AverageReward</code>, <code>SuccessRate</code>,
-  <code>AverageSteps</code>, and <code>Episodes</code>.
+  out-of-range action causes the submission to fail.
+</p>
+
+<p>
+  EvalAI leaderboard sync currently uses this placeholder metric contract:
+  <code>BinFill</code>, <code>PickXtimes</code>, <code>SwingXtimes</code>,
+  <code>StopCube</code>, <code>VideoUnmask</code>,
+  <code>VideoUnmaskSwap</code>, <code>ButtonUnmask</code>,
+  <code>ButtonUnmaskSwap</code>, <code>PickHighlight</code>,
+  <code>VideoRepick</code>, <code>VideoPlaceButton</code>,
+  <code>VideoPlaceOrder</code>, <code>MoveCube</code>, <code>InsertPeg</code>,
+  <code>PatternLock</code>, <code>RouteStick</code>,
+  <code>SuccessRate</code>, and <code>OverallSuccessRate</code>.
+</p>
+
+<p>
+  Real per-task scoring is not wired in this revision. Every leaderboard column
+  is currently returned as a placeholder <code>0.0</code> value so the EvalAI
+  configuration and remote evaluation payloads remain consistent.
 </p>

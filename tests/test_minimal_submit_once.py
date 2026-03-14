@@ -1,5 +1,6 @@
 import pytest
 
+from challenge_metrics import build_placeholder_metrics
 from remote_challenge_evaluation import minimal_submit_once as submit_once
 
 
@@ -30,6 +31,10 @@ class FakeEvalAI:
         )
 
 
+def expected_placeholder_metrics():
+    return build_placeholder_metrics()
+
+
 def test_run_once_dev_phase_uploads_placeholder_result():
     evalai = FakeEvalAI(phase_codename="dev")
 
@@ -47,20 +52,10 @@ def test_run_once_dev_phase_uploads_placeholder_result():
                 {
                     "split": "public_split",
                     "show_to_participant": True,
-                    "accuracies": {
-                        "AverageReward": 0.0,
-                        "SuccessRate": 0.0,
-                        "AverageSteps": 0.0,
-                        "Episodes": 0,
-                    },
+                    "accuracies": expected_placeholder_metrics(),
                 }
             ],
-            "submission_result": {
-                "AverageReward": 0.0,
-                "SuccessRate": 0.0,
-                "AverageSteps": 0.0,
-                "Episodes": 0,
-            },
+            "submission_result": expected_placeholder_metrics(),
             "metadata": "",
         }
     ]
@@ -83,30 +78,15 @@ def test_run_once_test_phase_uploads_public_and_private_results():
                 {
                     "split": "public_split",
                     "show_to_participant": True,
-                    "accuracies": {
-                        "AverageReward": 0.0,
-                        "SuccessRate": 0.0,
-                        "AverageSteps": 0.0,
-                        "Episodes": 0,
-                    },
+                    "accuracies": expected_placeholder_metrics(),
                 },
                 {
                     "split": "private_split",
                     "show_to_participant": False,
-                    "accuracies": {
-                        "AverageReward": 0.0,
-                        "SuccessRate": 0.0,
-                        "AverageSteps": 0.0,
-                        "Episodes": 0,
-                    },
+                    "accuracies": expected_placeholder_metrics(),
                 },
             ],
-            "submission_result": {
-                "AverageReward": 0.0,
-                "SuccessRate": 0.0,
-                "AverageSteps": 0.0,
-                "Episodes": 0,
-            },
+            "submission_result": expected_placeholder_metrics(),
             "metadata": "",
         }
     ]

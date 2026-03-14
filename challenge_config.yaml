@@ -8,7 +8,7 @@ terms_and_conditions: templates/terms_and_conditions.html
 image: logo.jpg
 submission_guidelines: templates/submission_guidelines.html
 category: [Environment, Workshop]
-leaderboard_description: Public leaderboard metrics come from the MiniGrid public split. Private split scores are hidden from participants.
+leaderboard_description: Public leaderboard columns follow the placeholder task contract on the public split. Private split columns remain hidden from participants.
 evaluation_script: evaluation_script.zip
 remote_evaluation: True
 start_date: 2026-03-12 00:00:00
@@ -24,24 +24,80 @@ leaderboard:
   - id: 1
     schema:
       labels:
-        - AverageReward
+        - BinFill
+        - PickXtimes
+        - SwingXtimes
+        - StopCube
+        - VideoUnmask
+        - VideoUnmaskSwap
+        - ButtonUnmask
+        - ButtonUnmaskSwap
+        - PickHighlight
+        - VideoRepick
+        - VideoPlaceButton
+        - VideoPlaceOrder
+        - MoveCube
+        - InsertPeg
+        - PatternLock
+        - RouteStick
         - SuccessRate
-        - AverageSteps
-        - Episodes
-      default_order_by: AverageReward
+        - OverallSuccessRate
+      default_order_by: OverallSuccessRate
       metadata:
-        AverageReward:
+        BinFill:
           sort_ascending: false
-          description: Mean episode reward on the split.
+          description: Placeholder success metric for the BinFill task on this split.
+        PickXtimes:
+          sort_ascending: false
+          description: Placeholder success metric for the PickXtimes task on this split.
+        SwingXtimes:
+          sort_ascending: false
+          description: Placeholder success metric for the SwingXtimes task on this split.
+        StopCube:
+          sort_ascending: false
+          description: Placeholder success metric for the StopCube task on this split.
+        VideoUnmask:
+          sort_ascending: false
+          description: Placeholder success metric for the VideoUnmask task on this split.
+        VideoUnmaskSwap:
+          sort_ascending: false
+          description: Placeholder success metric for the VideoUnmaskSwap task on this split.
+        ButtonUnmask:
+          sort_ascending: false
+          description: Placeholder success metric for the ButtonUnmask task on this split.
+        ButtonUnmaskSwap:
+          sort_ascending: false
+          description: Placeholder success metric for the ButtonUnmaskSwap task on this split.
+        PickHighlight:
+          sort_ascending: false
+          description: Placeholder success metric for the PickHighlight task on this split.
+        VideoRepick:
+          sort_ascending: false
+          description: Placeholder success metric for the VideoRepick task on this split.
+        VideoPlaceButton:
+          sort_ascending: false
+          description: Placeholder success metric for the VideoPlaceButton task on this split.
+        VideoPlaceOrder:
+          sort_ascending: false
+          description: Placeholder success metric for the VideoPlaceOrder task on this split.
+        MoveCube:
+          sort_ascending: false
+          description: Placeholder success metric for the MoveCube task on this split.
+        InsertPeg:
+          sort_ascending: false
+          description: Placeholder success metric for the InsertPeg task on this split.
+        PatternLock:
+          sort_ascending: false
+          description: Placeholder success metric for the PatternLock task on this split.
+        RouteStick:
+          sort_ascending: false
+          description: Placeholder success metric for the RouteStick task on this split.
         SuccessRate:
           sort_ascending: false
-          description: Fraction of episodes with positive total reward.
-        AverageSteps:
-          sort_ascending: true
-          description: Mean number of agent actions per episode.
-        Episodes:
+          description: Placeholder aggregate success rate for the task contract on this split.
+        OverallSuccessRate:
           sort_ascending: false
-          description: Number of evaluated episodes in the split.
+          description: Placeholder overall success rate used for leaderboard ordering until real task scoring is wired.
 
 challenge_phases:
   - id: 1

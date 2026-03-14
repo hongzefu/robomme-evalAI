@@ -2,7 +2,8 @@
 
 This repository hosts an EvalAI challenge where participants submit a JSON
 manifest pointing to a live HTTP agent. The evaluator creates
-`MiniGrid-Empty-5x5-v0` locally and sends observations to `POST /act`.
+`MiniGrid-Empty-5x5-v0` locally, sends observations to `POST /act`, and emits
+an 18-column placeholder leaderboard contract for EvalAI sync.
 
 ## Repository layout
 
@@ -81,7 +82,13 @@ JSON, missing field, or out-of-range action fails the submission.
 - Dev seeds: `0, 1, 2`
 - Test public seeds: `100, 101, 102, 103, 104`
 - Test private seeds: `1000` through `1019`
-- Metrics: `AverageReward`, `SuccessRate`, `AverageSteps`, `Episodes`
+- Leaderboard columns: `BinFill`, `PickXtimes`, `SwingXtimes`, `StopCube`,
+  `VideoUnmask`, `VideoUnmaskSwap`, `ButtonUnmask`, `ButtonUnmaskSwap`,
+  `PickHighlight`, `VideoRepick`, `VideoPlaceButton`, `VideoPlaceOrder`,
+  `MoveCube`, `InsertPeg`, `PatternLock`, `RouteStick`, `SuccessRate`,
+  `OverallSuccessRate`
+- Placeholder metric value: every leaderboard column currently returns `0.0`
+  until real task scoring is wired in
 
 `evaluation_script/main.py` is the only source of evaluation logic. The remote
 worker imports and reuses the same `evaluate()` function.
@@ -112,16 +119,18 @@ ALLOW_LOCAL_AGENT_URLS=1 .venv/bin/python smoke_test.py --agent-url http://127.0
 ## Automated tests
 
 ```bash
-.venv/bin/pytest -q
+.venv/bin/python -m pytest -q
 ```
 
-The tests cover manifest validation, agent protocol failures, rollout output,
-and remote worker queue handling.
+The tests cover manifest validation, agent protocol failures, placeholder
+leaderboard output, and remote worker queue handling.
 
 ## Notes
 
 - `annotations/*.json` are placeholders required by EvalAI configuration and are
   not used by runtime evaluation.
+- The current leaderboard schema is a placeholder task contract only. Real
+  per-task scoring is intentionally out of scope for this revision.
 - `submission.json` is a sample manifest only.
 - `challenge_data/challenge_1` remains as a thin compatibility wrapper around
   `evaluation_script.main`.

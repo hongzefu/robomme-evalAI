@@ -7,9 +7,24 @@
 </p>
 
 <p>
-  The evaluator creates the environment locally, runs fixed-seed episodes for
-  each split, and reports <code>AverageReward</code>, <code>SuccessRate</code>,
-  <code>AverageSteps</code>, and <code>Episodes</code>. The public leaderboard is
-  based on the test phase public split; the private split remains hidden for
-  final ranking and auditing.
+  The evaluator creates the environment locally and validates the HTTP agent
+  protocol on fixed-seed episodes for each split. Leaderboard sync now uses an
+  18-column placeholder task contract:
+  <code>BinFill</code>, <code>PickXtimes</code>, <code>SwingXtimes</code>,
+  <code>StopCube</code>, <code>VideoUnmask</code>,
+  <code>VideoUnmaskSwap</code>, <code>ButtonUnmask</code>,
+  <code>ButtonUnmaskSwap</code>, <code>PickHighlight</code>,
+  <code>VideoRepick</code>, <code>VideoPlaceButton</code>,
+  <code>VideoPlaceOrder</code>, <code>MoveCube</code>, <code>InsertPeg</code>,
+  <code>PatternLock</code>, <code>RouteStick</code>,
+  <code>SuccessRate</code>, and <code>OverallSuccessRate</code>.
+</p>
+
+<p>
+  This repository revision does not implement real task scoring yet. All 18
+  leaderboard columns are currently emitted as placeholder <code>0.0</code>
+  values so the EvalAI challenge configuration, remote worker, and submission
+  payloads stay in sync. The public leaderboard is still based on the test
+  phase public split; the private split remains hidden for final ranking and
+  auditing.
 </p>

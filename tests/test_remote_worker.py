@@ -3,6 +3,7 @@ from pathlib import Path
 
 import pytest
 
+from challenge_metrics import build_placeholder_metrics
 from remote_challenge_evaluation import main as worker_main
 from remote_challenge_evaluation.eval_ai_interface import EvalAI_Interface
 
@@ -46,6 +47,10 @@ def create_downloaded_manifest(tmp_path):
     return submission_path
 
 
+def expected_placeholder_metrics():
+    return build_placeholder_metrics()
+
+
 def test_process_message_success_path(monkeypatch, tmp_path):
     evalai = FakeEvalAI(status="submitted")
     downloaded_path = create_downloaded_manifest(tmp_path)
@@ -64,10 +69,10 @@ def test_process_message_success_path(monkeypatch, tmp_path):
                 {
                     "split": "public_split",
                     "show_to_participant": True,
-                    "accuracies": {"AverageReward": 1.0},
+                    "accuracies": expected_placeholder_metrics(),
                 }
             ],
-            "submission_result": {"AverageReward": 1.0},
+            "submission_result": expected_placeholder_metrics(),
         },
     )
 
@@ -87,10 +92,10 @@ def test_process_message_success_path(monkeypatch, tmp_path):
                 {
                     "split": "public_split",
                     "show_to_participant": True,
-                    "accuracies": {"AverageReward": 1.0},
+                    "accuracies": expected_placeholder_metrics(),
                 }
             ],
-            "submission_result": {"AverageReward": 1.0},
+            "submission_result": expected_placeholder_metrics(),
             "metadata": "",
         }
     ]
@@ -178,10 +183,10 @@ def test_process_message_logs_and_cleans_up_when_finish_update_fails(
                 {
                     "split": "public_split",
                     "show_to_participant": True,
-                    "accuracies": {"AverageReward": 2.0},
+                    "accuracies": expected_placeholder_metrics(),
                 }
             ],
-            "submission_result": {"AverageReward": 2.0},
+            "submission_result": expected_placeholder_metrics(),
         },
     )
 
@@ -248,10 +253,10 @@ def test_evalai_interface_serializes_result_and_metadata():
                 {
                     "split": "public_split",
                     "show_to_participant": True,
-                    "accuracies": {"AverageReward": 1.0},
+                    "accuracies": expected_placeholder_metrics(),
                 }
             ],
-            "submission_result": {"AverageReward": 1.0},
+            "submission_result": expected_placeholder_metrics(),
             "metadata": {"episode_count": 3},
             "stdout": "",
         }
@@ -264,11 +269,11 @@ def test_evalai_interface_serializes_result_and_metadata():
                 {
                     "split": "public_split",
                     "show_to_participant": True,
-                    "accuracies": {"AverageReward": 1.0},
+                    "accuracies": expected_placeholder_metrics(),
                 }
             ]
         ),
-        "submission_result": json.dumps({"AverageReward": 1.0}),
+        "submission_result": json.dumps(expected_placeholder_metrics()),
         "metadata": json.dumps({"episode_count": 3}),
         "stdout": "",
     }

@@ -3,6 +3,7 @@ import json
 import pytest
 import requests
 
+from challenge_metrics import METRIC_LABELS, build_placeholder_metrics
 from evaluation_script import main as eval_main
 
 
@@ -91,6 +92,10 @@ def install_fixed_action(monkeypatch, action=0, sink=None):
 
     monkeypatch.setattr(eval_main.requests, "post", fake_post)
     return requests_seen
+
+
+def expected_placeholder_metrics():
+    return build_placeholder_metrics()
 
 
 def test_manifest_must_include_only_agent_url(tmp_path):
@@ -184,15 +189,14 @@ def test_evaluate_sends_expected_payload_and_closes_envs(monkeypatch, tmp_path):
         {
             "split": "public_split",
             "show_to_participant": True,
-            "accuracies": {
-                "AverageReward": 1.0,
-                "SuccessRate": 1.0,
-                "AverageSteps": 1.0,
-                "Episodes": 3,
-            },
+            "accuracies": expected_placeholder_metrics(),
         }
     ]
     assert result["submission_result"] == result["result"][0]["accuracies"]
+    assert list(result["result"][0]["accuracies"]) == list(METRIC_LABELS)
+    assert {"AverageReward", "AverageSteps", "Episodes"}.isdisjoint(
+        result["result"][0]["accuracies"]
+    )
     assert len(envs) == 3
     assert all(env.closed for env in envs)
 
@@ -259,25 +263,16 @@ def test_test_phase_returns_public_and_private_splits(monkeypatch, tmp_path):
         {
             "split": "public_split",
             "show_to_participant": True,
-            "accuracies": {
-                "AverageReward": 1.0,
-                "SuccessRate": 1.0,
-                "AverageSteps": 1.0,
-                "Episodes": 5,
-            },
+            "accuracies": expected_placeholder_metrics(),
         },
         {
             "split": "private_split",
             "show_to_participant": False,
-            "accuracies": {
-                "AverageReward": 1.0,
-                "SuccessRate": 1.0,
-                "AverageSteps": 1.0,
-                "Episodes": 20,
-            },
+            "accuracies": expected_placeholder_metrics(),
         },
     ]
     assert result["submission_result"] == result["result"][0]["accuracies"]
+    assert list(result["result"][1]["accuracies"]) == list(METRIC_LABELS)
 
 
 def test_envs_are_closed_when_agent_response_fails(monkeypatch, tmp_path):

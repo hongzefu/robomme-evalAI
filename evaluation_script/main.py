@@ -9,12 +9,15 @@ import gymnasium as gym
 import minigrid  # noqa: F401
 import requests
 
+from challenge_metrics import build_placeholder_metrics
+
 
 ENV_ID = "MiniGrid-Empty-5x5-v0"
 MAX_STEPS = 100
 ACTION_SPACE_SIZE = 7
 DEFAULT_AGENT_TIMEOUT_SEC = 10
 DEFAULT_AGENT_REQUEST_ATTEMPTS = 3
+PLACEHOLDER_METRICS = build_placeholder_metrics()
 PHASE_SPLITS = {
     "dev": [("public_split", [0, 1, 2])],
     "test": [
@@ -173,28 +176,16 @@ def agent_request_attempts():
 
 
 def evaluate_split(agent_url, phase_codename, split_name, seeds):
-    total_reward = 0.0
-    total_steps = 0
-    success_count = 0
+    del split_name
 
     for episode_index, episode_seed in enumerate(seeds):
-        reward, steps = run_episode(
+        run_episode(
             agent_url=agent_url,
             phase_codename=phase_codename,
             episode_index=episode_index,
             episode_seed=episode_seed,
         )
-        total_reward += reward
-        total_steps += steps
-        success_count += int(reward > 0)
-
-    episode_count = len(seeds)
-    return {
-        "AverageReward": total_reward / episode_count,
-        "SuccessRate": success_count / episode_count,
-        "AverageSteps": total_steps / episode_count,
-        "Episodes": episode_count,
-    }
+    return PLACEHOLDER_METRICS.copy()
 
 
 def run_episode(agent_url, phase_codename, episode_index, episode_seed):

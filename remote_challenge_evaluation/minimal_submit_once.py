@@ -25,6 +25,8 @@ PROJECT_ROOT = "/data/hongzefu/EvalAI-Starters-minigrid"
 if PROJECT_ROOT not in sys.path:
     sys.path.insert(0, PROJECT_ROOT)
 
+from challenge_metrics import build_placeholder_metrics
+
 # 下面这组配置直接复制自现有 `remote_challenge_evaluation/main.py`。
 # 这样可以保证这个最小脚本的认证信息、挑战 ID、API 地址与主 worker 保持一致。
 AUTH_TOKEN = "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ0b2tlbl90eXBlIjoicmVmcmVzaCIsImV4cCI6MTgwNDkwMTE5NywianRpIjoiZTc5MDg4Zjc0ZjYzNDA3ZmI5Y2Q2NGY2ZWY5ZGZjYjEiLCJ1c2VyX2lkIjo2MzMwMn0.wlxfPqHqnqbJmyHWMKA9xj73Cq9l7hWwVdm-ivBm1Z0"
@@ -55,12 +57,7 @@ LOGGER = logging.getLogger(__name__)
 
 # 固定占位指标。这个脚本不做真实评测，所以所有数值都写死为 0。
 # 字段名必须与 challenge_config.yaml 里的 leaderboard schema 对齐。
-PLACEHOLDER_METRICS = {
-    "AverageReward": 0.0,
-    "SuccessRate": 0.0,
-    "AverageSteps": 0.0,
-    "Episodes": 0,
-}
+PLACEHOLDER_METRICS = build_placeholder_metrics()
 
 # phase codename 与需要上传的 split 列表映射。
 # 元组结构为：
