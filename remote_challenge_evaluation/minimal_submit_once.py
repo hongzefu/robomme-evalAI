@@ -35,7 +35,7 @@ QUEUE_NAME = "minigrid-http-agent-challenge-2674-production-37fa1751-3a6b-43c4-8
 CHALLENGE_PK = "2674"
 
 # 硬编码默认 submission / phase（不传参数时使用）
-DEFAULT_SUBMISSION_PK = 566847
+DEFAULT_SUBMISSION_PK = 566855 
 DEFAULT_PHASE_PK = 5297
 
 # 用“按文件路径加载”的方式导入本目录下的 `eval_ai_interface.py`。
