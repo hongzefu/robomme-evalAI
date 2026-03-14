@@ -2,12 +2,12 @@
 EvalAI: 批量删除 challenge 下的所有 submissions
 
 用法:
-    python delete-all-tasks.py <AUTH_TOKEN> [challenge_pk]
+    python delete-all-tasks.py [AUTH_TOKEN] [challenge_pk]
 
 说明:
-    - 默认 challenge_pk = 2674
-    - token 需要是当前有效的 EvalAI token
-    - 脚本会先列出所有 phase，再列出每个 phase 的 submissions，并逐个调用 DELETE
+    - 不传参数时使用下方硬编码的默认值
+    - 通过 host 侧 submissions 接口获取 challenge 的所有提交
+    - 包含普通 phase submissions 接口里看不到的隐藏 host submissions
 """
 
 import base64
@@ -16,7 +16,11 @@ import sys
 
 import requests
 
+# Remote Evaluation Meta (硬编码)
 DEFAULT_CHALLENGE_PK = 2674
+QUEUE_NAME = "minigrid-http-agent-challenge-2674-production-37fa1751-3a6b-43c4-87c2-5787e57bd7"
+DEFAULT_AUTH_TOKEN = "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ0b2tlbl90eXBlIjoicmVmcmVzaCIsImV4cCI6MTgwNDkwMTE5NywianRpIjoiZTc5MDg4Zjc0ZjYzNDA3ZmI5Y2Q2NGY2ZWY5ZGZjYjEiLCJ1c2VyX2lkIjo2MzMwMn0.wlxfPqHqnqbJmyHWMKA9xj73Cq9l7hWwVdm-ivBm1Z0"
+
 BASE_URL = "https://eval.ai/api"
 TIMEOUT = 30
 
@@ -91,17 +95,29 @@ def get_submissions(challenge_pk, phase_pk, token, page=1):
     return response, response.json()
 
 
+def normalize_submission_list(data):
+    if isinstance(data, list):
+        return data
+    if isinstance(data, dict) and "results" in data:
+        return data["results"]
+    return []
+
+
+def get_all_submissions(challenge_pk, token):
+    url = f"{BASE_URL}/jobs/challenge/{challenge_pk}/submission/"
+    response = request("GET", url, token)
+    if response.status_code != 200:
+        return response, None
+    return response, normalize_submission_list(response.json())
+
+
 def delete_submission(submission_id, token):
     url = f"{BASE_URL}/jobs/submission/{submission_id}"
     return request("DELETE", url, token)
 
 
 def main():
-    if len(sys.argv) < 2:
-        print("用法: python delete-all-tasks.py <AUTH_TOKEN> [challenge_pk]")
-        sys.exit(1)
-
-    token = sys.argv[1].strip()
+    token = sys.argv[1].strip() if len(sys.argv) >= 2 else DEFAULT_AUTH_TOKEN
     challenge_pk = int(sys.argv[2]) if len(sys.argv) >= 3 else DEFAULT_CHALLENGE_PK
 
     print(f"[1] 获取 Challenge {challenge_pk} 的 phases...")
@@ -116,50 +132,56 @@ def main():
 
     print(f"   找到 {len(phases)} 个 phase(s)")
 
+    print(f"[2] 获取 Challenge {challenge_pk} 的全部 submissions（含隐藏项）...")
+    submissions_response, submissions = get_all_submissions(challenge_pk, token)
+    if submissions_response.status_code != 200:
+        print(f"获取 submissions 失败: {submissions_response.status_code}")
+        if submissions_response.status_code == 401:
+            print_auth_hint_if_needed(submissions_response, token)
+        else:
+            print(submissions_response.text[:500])
+        sys.exit(1)
+
+    submissions_by_phase = {}
+    for submission in submissions:
+        submissions_by_phase.setdefault(submission.get("challenge_phase"), []).append(submission)
+
     total_deleted = 0
 
     for phase in phases:
         phase_pk = phase["id"]
         phase_name = phase.get("name", f"Phase {phase_pk}")
-        print(f"\n[2] 处理 Phase: {phase_name} (ID: {phase_pk})")
+        print(f"\n[3] 处理 Phase: {phase_name} (ID: {phase_pk})")
 
-        page = 1
+        phase_submissions = sorted(
+            submissions_by_phase.get(phase_pk, []),
+            key=lambda submission: submission.get("id", 0),
+            reverse=True,
+        )
         phase_seen = 0
         phase_deleted = 0
 
-        while True:
-            submissions_response, data = get_submissions(challenge_pk, phase_pk, token, page=page)
-            if submissions_response.status_code != 200:
-                print(f"   获取 submissions 失败 (page {page}): {submissions_response.status_code}")
-                if submissions_response.status_code == 401:
-                    print_auth_hint_if_needed(submissions_response, token)
-                    sys.exit(1)
-                print(submissions_response.text[:500])
-                break
+        for sub in phase_submissions:
+            submission_id = sub["id"]
+            status = sub.get("status", "unknown")
+            hidden = bool(sub.get("ignore_submission")) or not bool(
+                sub.get("is_public", True)
+            )
+            phase_seen += 1
 
-            results = data.get("results", [])
-            if not results:
-                break
+            print(
+                f"   删除 Submission #{submission_id} "
+                f"(status: {status}, hidden: {hidden})"
+            )
+            delete_response = delete_submission(submission_id, token)
 
-            for sub in results:
-                submission_id = sub["id"]
-                status = sub.get("status", "unknown")
-                phase_seen += 1
-
-                print(f"   删除 Submission #{submission_id} (status: {status})")
-                delete_response = delete_submission(submission_id, token)
-
-                if delete_response.status_code in (200, 202, 204):
-                    phase_deleted += 1
-                    total_deleted += 1
-                    print("     已删除")
-                else:
-                    print(f"     删除失败: {delete_response.status_code}")
-                    print(f"     {delete_response.text[:300]}")
-
-            if not data.get("next"):
-                break
-            page += 1
+            if delete_response.status_code in (200, 202, 204):
+                phase_deleted += 1
+                total_deleted += 1
+                print("     已删除")
+            else:
+                print(f"     删除失败: {delete_response.status_code}")
+                print(f"     {delete_response.text[:300]}")
 
         print(f"   Phase {phase_name}: 扫描 {phase_seen} 个，删除 {phase_deleted} 个")
 
