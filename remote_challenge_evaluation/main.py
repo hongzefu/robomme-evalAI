@@ -1,15 +1,35 @@
+import importlib.util
 import json
 import logging
 import os
+import sys
 import tempfile
 import time
 from pathlib import Path
 
 import requests
 
-from evaluation_script.main import evaluate
+# 硬编码配置（原 export 的环境变量）
+PROJECT_ROOT = "/data/hongzefu/EvalAI-Starters-minigrid"
+if PROJECT_ROOT not in sys.path:
+    sys.path.insert(0, PROJECT_ROOT)
 
-from .eval_ai_interface import EvalAI_Interface
+AUTH_TOKEN = "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ0b2tlbl90eXBlIjoicmVmcmVzaCIsImV4cCI6MTgwNDkwMTE5NywianRpIjoiZTc5MDg4Zjc0ZjYzNDA3ZmI5Y2Q2NGY2ZWY5ZGZjYjEiLCJ1c2VyX2lkIjo2MzMwMn0.wlxfPqHqnqbJmyHWMKA9xj73Cq9l7hWwVdm-ivBm1Z0"
+API_SERVER = "https://eval.ai"
+QUEUE_NAME = "minigrid-http-agent-challenge-2674-production-37fa1751-3a6b-43c4-87c2-5787e57bd7"
+CHALLENGE_PK = "2674"
+
+# 直接加载同目录下的 eval_ai_interface（支持 python main.py 直接运行）
+_SCRIPT_DIR = Path(__file__).resolve().parent
+_spec = importlib.util.spec_from_file_location(
+    "eval_ai_interface",
+    _SCRIPT_DIR / "eval_ai_interface.py",
+)
+_eval_ai_module = importlib.util.module_from_spec(_spec)
+_spec.loader.exec_module(_eval_ai_module)
+EvalAI_Interface = _eval_ai_module.EvalAI_Interface
+
+from evaluation_script.main import evaluate
 
 
 LOGGER = logging.getLogger(__name__)
@@ -189,10 +209,10 @@ def get_poll_interval_sec():
 
 def build_evalai_interface_from_env():
     return EvalAI_Interface(
-        os.environ["AUTH_TOKEN"],
-        os.environ["API_SERVER"],
-        os.environ["QUEUE_NAME"],
-        os.environ["CHALLENGE_PK"],
+        AUTH_TOKEN,
+        API_SERVER,
+        QUEUE_NAME,
+        CHALLENGE_PK,
     )
 
 
